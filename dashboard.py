@@ -435,9 +435,14 @@ def main():
         st.metric("🔒 Exchange Connessi", f"{connected_count}/3")
     
     with col3:
-        # Calcola P&L giornaliero (simulato)
+        # Calcola P&L giornaliero (simulato) - FIX: evita divisione per zero
         daily_pnl = total_portfolio_value * 0.02  # 2% simulato
-        st.metric("📈 P&L Giornaliero", f"€{daily_pnl:,.2f}", f"{daily_pnl/total_portfolio_value*100:.2f}%")
+        if total_portfolio_value > 0:
+            pnl_percentage = f"{daily_pnl/total_portfolio_value*100:.2f}%"
+        else:
+            pnl_percentage = "0.00%"
+        
+        st.metric("📈 P&L Giornaliero", f"€{daily_pnl:,.2f}", pnl_percentage)
     
     st.markdown("---")
     
