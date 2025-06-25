@@ -317,6 +317,8 @@ def security_status_indicator():
         st.sidebar.success(f"🔒 {connected_exchanges}/3 Exchange connessi in modo sicuro")
     else:
         st.sidebar.info("🔓 Nessun exchange connesso")
+
+def create_portfolio_chart(balances_data):
     """Crea il grafico del portafoglio"""
     if not balances_data:
         return None
