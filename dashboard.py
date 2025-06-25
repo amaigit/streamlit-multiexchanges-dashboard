@@ -20,6 +20,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Inizializza i dati sensibili nel session state se non esistono
+if 'credentials' not in st.session_state:
+    st.session_state.credentials = {
+        'kraken': {'api_key': '', 'api_secret': '', 'connected': False},
+        'binance': {'api_key': '', 'api_secret': '', 'connected': False},
+        'capital': {'api_key': '', 'password': '', 'demo': True, 'connected': False}
+    }
+
+if 'show_credentials' not in st.session_state:
+    st.session_state.show_credentials = False
+
 # Classe per gestire le connessioni agli exchange
 class ExchangeManager:
     def __init__(self):
