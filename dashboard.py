@@ -429,7 +429,8 @@ def main():
         st.metric("💰 Valore Totale Portafoglio", f"€{total_portfolio_value:,.2f}")
     
     with col2:
-        st.metric("📊 Exchange Connessi", f"{len([b for b in balances.values() if b])}/3")
+        connected_count = len(connected_exchanges)
+        st.metric("🔒 Exchange Connessi", f"{connected_count}/3")
     
     with col3:
         # Calcola P&L giornaliero (simulato)
