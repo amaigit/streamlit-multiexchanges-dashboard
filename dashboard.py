@@ -36,12 +36,16 @@ class ExchangeManager:
     def __init__(self):
         self.exchanges = {}
     
-    def setup_kraken(self, api_key, api_secret):
-        """Configura la connessione a Kraken"""
+    def setup_kraken(self):
+        """Configura la connessione a Kraken usando credenziali dal session state"""
         try:
+            creds = st.session_state.credentials['kraken']
+            if not creds['api_key'] or not creds['api_secret']:
+                return False
+            
             self.exchanges['kraken'] = ccxt.kraken({
-                'apiKey': api_key,
-                'secret': api_secret,
+                'apiKey': creds['api_key'],
+                'secret': creds['api_secret'],
                 'sandbox': False,
                 'enableRateLimit': True,
             })
@@ -50,12 +54,16 @@ class ExchangeManager:
             st.error(f"Errore configurazione Kraken: {e}")
             return False
     
-    def setup_binance(self, api_key, api_secret):
-        """Configura la connessione a Binance"""
+    def setup_binance(self):
+        """Configura la connessione a Binance usando credenziali dal session state"""
         try:
+            creds = st.session_state.credentials['binance']
+            if not creds['api_key'] or not creds['api_secret']:
+                return False
+            
             self.exchanges['binance'] = ccxt.binance({
-                'apiKey': api_key,
-                'secret': api_secret,
+                'apiKey': creds['api_key'],
+                'secret': creds['api_secret'],
                 'sandbox': False,
                 'enableRateLimit': True,
             })
@@ -64,15 +72,23 @@ class ExchangeManager:
             st.error(f"Errore configurazione Binance: {e}")
             return False
     
-    def setup_capital(self, api_key, password, demo=True):
-        """Configura la connessione a Capital.com"""
-        # Capital.com usa un approccio diverso - login basato su sessione
-        self.capital_credentials = {
-            'api_key': api_key,
-            'password': password,
-            'demo': demo
-        }
-        return True
+    def setup_capital(self):
+        """Configura la connessione a Capital.com usando credenziali dal session state"""
+        try:
+            creds = st.session_state.credentials['capital']
+            if not creds['api_key'] or not creds['password']:
+                return False
+            
+            # Capital.com usa un approccio diverso - login basato su sessione
+            self.capital_credentials = {
+                'api_key': creds['api_key'],
+                'password': creds['password'],
+                'demo': creds['demo']
+            }
+            return True
+        except Exception as e:
+            st.error(f"Errore configurazione Capital.com: {e}")
+            return False
     
     def get_balance(self, exchange_name):
         """Ottiene il balance da un exchange"""
