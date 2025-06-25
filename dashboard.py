@@ -479,7 +479,7 @@ def main():
     with col2:
         st.subheader("🎯 Posizioni Aperte")
         all_positions = []
-        for exchange in exchanges:
+        for exchange in connected_exchanges:
             positions = st.session_state.exchange_manager.get_positions(exchange)
             for pos in positions:
                 all_positions.append({
@@ -494,7 +494,10 @@ def main():
             positions_df = pd.DataFrame(all_positions)
             st.dataframe(positions_df, use_container_width=True)
         else:
-            st.info("Nessuna posizione aperta trovata")
+            if connected_exchanges:
+                st.info("Nessuna posizione aperta trovata")
+            else:
+                st.info("Connetti almeno un exchange per visualizzare le posizioni")
     
     # Prezzi crypto
     st.markdown("---")
