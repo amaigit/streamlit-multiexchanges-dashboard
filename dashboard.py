@@ -518,7 +518,8 @@ def main():
     st.markdown("""
     <div style='text-align: center; color: #666;'>
         <p>Dashboard Trading Multi-Exchange | Ultimo aggiornamento: {}</p>
-        <p><small>⚠️ Assicurati di utilizzare API key con permessi di sola lettura per sicurezza</small></p>
+        <p><small>🔒 Le tue credenziali rimangono solo in memoria locale e non vengono mai inviate al server</small></p>
+        <p><small>⚠️ Usa sempre API key con permessi di SOLA LETTURA per massima sicurezza</small></p>
     </div>
     """.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")), unsafe_allow_html=True)
 
