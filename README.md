@@ -2,6 +2,8 @@
 
 Una dashboard Streamlit sicura per monitorare i tuoi portafogli di trading su Kraken, Binance e Capital.com con gestione locale delle credenziali.
 
+> Prova la demo online su [multiexchanges-dashboard.streamlit.app](https://multiexchanges-dashboard.streamlit.app/)!
+
 ## ✨ Caratteristiche Principali
 
 ### 🔒 **Sicurezza Avanzata**
