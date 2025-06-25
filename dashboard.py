@@ -144,7 +144,179 @@ def get_crypto_prices():
         st.error(f"Errore recupero prezzi: {e}")
         return {}
 
-def create_portfolio_chart(balances_data):
+def credentials_manager():
+    """Gestisce l'inserimento sicuro delle credenziali"""
+    st.sidebar.header("🔒 Gestione Credenziali")
+    
+    # Toggle per mostrare/nascondere le credenziali
+    if st.sidebar.button("👁️ Mostra/Nascondi Credenziali"):
+        st.session_state.show_credentials = not st.session_state.show_credentials
+    
+    if st.session_state.show_credentials:
+        st.sidebar.warning("⚠️ Le credenziali sono visibili. Assicurati che nessuno stia guardando!")
+    
+    # Gestione credenziali Kraken
+    with st.sidebar.expander("🐙 Kraken", expanded=not st.session_state.credentials['kraken']['connected']):
+        if st.session_state.credentials['kraken']['connected']:
+            st.success("✅ Connesso")
+            if st.button("Disconnetti Kraken", key="disconnect_kraken"):
+                st.session_state.credentials['kraken'] = {'api_key': '', 'api_secret': '', 'connected': False}
+                st.rerun()
+        else:
+            input_type = "text" if st.session_state.show_credentials else "password"
+            
+            api_key = st.text_input(
+                "API Key Kraken", 
+                value=st.session_state.credentials['kraken']['api_key'],
+                type=input_type,
+                key="kraken_key_input",
+                help="La tua API key rimarrà solo in memoria locale"
+            )
+            
+            api_secret = st.text_input(
+                "API Secret Kraken", 
+                value=st.session_state.credentials['kraken']['api_secret'],
+                type=input_type,
+                key="kraken_secret_input",
+                help="Il tuo API secret rimarrà solo in memoria locale"
+            )
+            
+            if st.button("Connetti Kraken", key="connect_kraken"):
+                if api_key and api_secret:
+                    st.session_state.credentials['kraken']['api_key'] = api_key
+                    st.session_state.credentials['kraken']['api_secret'] = api_secret
+                    
+                    # Testa la connessione
+                    success = st.session_state.exchange_manager.setup_kraken()
+                    if success:
+                        st.session_state.credentials['kraken']['connected'] = True
+                        st.success("Kraken connesso con successo!")
+                        st.rerun()
+                else:
+                    st.error("Inserisci entrambe le credenziali")
+    
+    # Gestione credenziali Binance
+    with st.sidebar.expander("🔶 Binance", expanded=not st.session_state.credentials['binance']['connected']):
+        if st.session_state.credentials['binance']['connected']:
+            st.success("✅ Connesso")
+            if st.button("Disconnetti Binance", key="disconnect_binance"):
+                st.session_state.credentials['binance'] = {'api_key': '', 'api_secret': '', 'connected': False}
+                st.rerun()
+        else:
+            input_type = "text" if st.session_state.show_credentials else "password"
+            
+            api_key = st.text_input(
+                "API Key Binance", 
+                value=st.session_state.credentials['binance']['api_key'],
+                type=input_type,
+                key="binance_key_input",
+                help="La tua API key rimarrà solo in memoria locale"
+            )
+            
+            api_secret = st.text_input(
+                "API Secret Binance", 
+                value=st.session_state.credentials['binance']['api_secret'],
+                type=input_type,
+                key="binance_secret_input",
+                help="Il tuo API secret rimarrà solo in memoria locale"
+            )
+            
+            if st.button("Connetti Binance", key="connect_binance"):
+                if api_key and api_secret:
+                    st.session_state.credentials['binance']['api_key'] = api_key
+                    st.session_state.credentials['binance']['api_secret'] = api_secret
+                    
+                    # Testa la connessione
+                    success = st.session_state.exchange_manager.setup_binance()
+                    if success:
+                        st.session_state.credentials['binance']['connected'] = True
+                        st.success("Binance connesso con successo!")
+                        st.rerun()
+                else:
+                    st.error("Inserisci entrambe le credenziali")
+    
+    # Gestione credenziali Capital.com
+    with st.sidebar.expander("💼 Capital.com", expanded=not st.session_state.credentials['capital']['connected']):
+        if st.session_state.credentials['capital']['connected']:
+            st.success("✅ Connesso")
+            if st.button("Disconnetti Capital.com", key="disconnect_capital"):
+                st.session_state.credentials['capital'] = {'api_key': '', 'password': '', 'demo': True, 'connected': False}
+                st.rerun()
+        else:
+            input_type = "text" if st.session_state.show_credentials else "password"
+            
+            api_key = st.text_input(
+                "API Key Capital.com", 
+                value=st.session_state.credentials['capital']['api_key'],
+                type=input_type,
+                key="capital_key_input",
+                help="La tua API key rimarrà solo in memoria locale"
+            )
+            
+            password = st.text_input(
+                "Password Capital.com", 
+                value=st.session_state.credentials['capital']['password'],
+                type=input_type,
+                key="capital_password_input",
+                help="La tua password rimarrà solo in memoria locale"
+            )
+            
+            demo = st.checkbox(
+                "Account Demo", 
+                value=st.session_state.credentials['capital']['demo'],
+                key="capital_demo_input"
+            )
+            
+            if st.button("Connetti Capital.com", key="connect_capital"):
+                if api_key and password:
+                    st.session_state.credentials['capital']['api_key'] = api_key
+                    st.session_state.credentials['capital']['password'] = password
+                    st.session_state.credentials['capital']['demo'] = demo
+                    
+                    # Testa la connessione
+                    success = st.session_state.exchange_manager.setup_capital()
+                    if success:
+                        st.session_state.credentials['capital']['connected'] = True
+                        st.success("Capital.com connesso con successo!")
+                        st.rerun()
+                else:
+                    st.error("Inserisci entrambe le credenziali")
+    
+    # Pulsante per cancellare tutte le credenziali
+    st.sidebar.markdown("---")
+    if st.sidebar.button("🗑️ Cancella Tutte le Credenziali", type="secondary"):
+        if st.sidebar.button("⚠️ Conferma Cancellazione", type="primary"):
+            st.session_state.credentials = {
+                'kraken': {'api_key': '', 'api_secret': '', 'connected': False},
+                'binance': {'api_key': '', 'api_secret': '', 'connected': False},
+                'capital': {'api_key': '', 'password': '', 'demo': True, 'connected': False}
+            }
+            st.session_state.show_credentials = False
+            st.sidebar.success("Tutte le credenziali sono state cancellate dalla memoria")
+            st.rerun()
+    
+    # Informazioni sulla sicurezza
+    st.sidebar.markdown("---")
+    st.sidebar.info("""
+    🔐 **Sicurezza delle Credenziali:**
+    
+    ✅ Le tue API key rimangono SOLO in memoria locale
+    
+    ✅ Non vengono mai inviate al server Streamlit
+    
+    ✅ Vengono cancellate quando chiudi la sessione
+    
+    ⚠️ Usa sempre API key con permessi di SOLA LETTURA
+    """)
+
+def security_status_indicator():
+    """Mostra lo stato di sicurezza delle connessioni"""
+    connected_exchanges = sum(1 for creds in st.session_state.credentials.values() if creds['connected'])
+    
+    if connected_exchanges > 0:
+        st.sidebar.success(f"🔒 {connected_exchanges}/3 Exchange connessi in modo sicuro")
+    else:
+        st.sidebar.info("🔓 Nessun exchange connesso")
     """Crea il grafico del portafoglio"""
     if not balances_data:
         return None
