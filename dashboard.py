@@ -385,43 +385,13 @@ def main():
     if 'exchange_manager' not in st.session_state:
         st.session_state.exchange_manager = ExchangeManager()
     
-    # Sidebar per configurazione
+    # Sidebar per configurazione sicura
     with st.sidebar:
-        st.header("🔧 Configurazione API")
+        # Gestione credenziali sicura
+        credentials_manager()
         
-        # Configurazione Kraken
-        st.subheader("Kraken")
-        kraken_api_key = st.text_input("API Key Kraken", type="password", key="kraken_key")
-        kraken_api_secret = st.text_input("API Secret Kraken", type="password", key="kraken_secret")
-        
-        if st.button("Connetti Kraken"):
-            if kraken_api_key and kraken_api_secret:
-                success = st.session_state.exchange_manager.setup_kraken(kraken_api_key, kraken_api_secret)
-                if success:
-                    st.success("Kraken connesso!")
-        
-        # Configurazione Binance
-        st.subheader("Binance")
-        binance_api_key = st.text_input("API Key Binance", type="password", key="binance_key")
-        binance_api_secret = st.text_input("API Secret Binance", type="password", key="binance_secret")
-        
-        if st.button("Connetti Binance"):
-            if binance_api_key and binance_api_secret:
-                success = st.session_state.exchange_manager.setup_binance(binance_api_key, binance_api_secret)
-                if success:
-                    st.success("Binance connesso!")
-        
-        # Configurazione Capital.com
-        st.subheader("Capital.com")
-        capital_api_key = st.text_input("API Key Capital.com", type="password", key="capital_key")
-        capital_password = st.text_input("Password Capital.com", type="password", key="capital_pass")
-        capital_demo = st.checkbox("Account Demo", value=True)
-        
-        if st.button("Connetti Capital.com"):
-            if capital_api_key and capital_password:
-                success = st.session_state.exchange_manager.setup_capital(capital_api_key, capital_password, capital_demo)
-                if success:
-                    st.success("Capital.com connesso!")
+        # Indicatore stato sicurezza
+        security_status_indicator()
         
         st.markdown("---")
         
@@ -433,12 +403,13 @@ def main():
     # Area principale
     col1, col2, col3 = st.columns(3)
     
-    # Recupera i balances
+    # Recupera i balances solo per gli exchange connessi
     balances = {}
     total_portfolio_value = 0
     
-    exchanges = ['kraken', 'binance', 'capital']
-    for exchange in exchanges:
+    connected_exchanges = [name for name, creds in st.session_state.credentials.items() if creds['connected']]
+    
+    for exchange in connected_exchanges:
         balance = st.session_state.exchange_manager.get_balance(exchange)
         balances[exchange] = balance
         
